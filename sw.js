@@ -1,4 +1,4 @@
-const CACHE = 'china-guide-v1';
+const CACHE = 'china-guide-v2';
 const ASSETS = [
   './',
   './index.html',
