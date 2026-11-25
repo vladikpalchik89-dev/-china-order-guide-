@@ -1,0 +1,85 @@
+name: Build offline APK
+
+on:
+  push:
+    paths:
+      - 'android/**'
+      - 'index.html'
+      - 'sw.js'
+      - 'assets/**'
+      - 'docs/**'
+      - '.github/workflows/build-apk.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android platform
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.7'
+
+      - name: Copy full guide into app assets
+        run: |
+          mkdir -p android/app/src/main/assets/www/docs
+          cp index.html manifest.webmanifest sw.js android/app/src/main/assets/www/
+          cp -R assets android/app/src/main/assets/www/
+          cp docs/* android/app/src/main/assets/www/docs/
+          sed -i "s|if(location.hash !== '#' + name){ history.replaceState(null, '', '#' + name); }|try{ if(location.hash !== '#' + name){ history.replaceState(null, '', '#' + name); } }catch(e){}|" android/app/src/main/assets/www/index.html
+          echo "Assets copied:"
+          find android/app/src/main/assets -type f | sort
+
+      - name: Build APK
+        run: gradle -p android assembleDebug --no-daemon --stacktrace
+
+      - name: Prepare APK
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk china-guide-offline.apk
+          ls -lh china-guide-offline.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: china-guide-apk
+          path: china-guide-offline.apk
+          if-no-files-found: error
+
+      - name: Publish APK in Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-v3
+          name: Китай без обмана — офлайн APK v3
+          body: |
+            Полное приложение «Китай без обмана» в одном APK.
+
+            Внутри: все разделы гайда, калькулятор сметы, чек-листы, шаблоны,
+            маршруты с посредником и без, обучение китайскому приложению
+            1688 / Alibaba, таможня, отчёты и полные тексты из папки docs.
+
+            Работает без интернета: страницы и стили лежат внутри APK.
+            Установка: скачай APK, разреши установку из неизвестных источников.
+
+            Версия веб-приложения: https://vladikpalchik89-dev.github.io/-china-order-guide-/
+          files: china-guide-offline.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

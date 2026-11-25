@@ -1,7 +1,10 @@
 # Китай без обмана — гайд и калькулятор
 
 **Опубликованное приложение:** https://vladikpalchik89-dev.github.io/-china-order-guide-/  
+**Готовый APK для Android:** https://github.com/vladikpalchik89-dev/-china-order-guide-/releases/latest  
 **Репозиторий:** https://github.com/vladikpalchik89-dev/-china-order-guide-
+
+APK — это то же приложение, но целиком внутри одного файла: интернет не нужен вообще. Скачай `china-guide-offline.apk` из Releases и открой его на телефоне. При установке разреши «установку из неизвестных источников». Сборка APK запускается через `.github/workflows/build-apk.yml`.
 
 Офлайн-приложение для того, чтобы заказывать из Китая дёшево, проверенно и без платных курсов. Работает как обычный сайт: можно открыть `index.html` на телефоне или залить на GitHub Pages.
 

@@ -1,0 +1,27 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.vladik.chinaguide'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.vladik.chinaguide"
+        minSdk 21
+        targetSdk 35
+        versionCode 3
+        versionName "1.3"
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ""
+            debuggable false
+        }
+        release {
+            minifyEnabled false
+            debuggable false
+        }
+    }
+}
