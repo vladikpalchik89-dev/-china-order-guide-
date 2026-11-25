@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="Офлайн-приложение: как заказывать из Китая дёшево и без обмана. Площадки, посредники, смета, чек-листы, шаблоны, таможня, отчёты.">
+  <title>Китай без обмана — гайд и калькулятор</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <style>
+    :root{
+      --bg:#f5f7fb; --panel:#ffffff; --text:#14213d; --muted:#5f6b7f;
+      --line:#dfe4ee; --accent:#0a66c2; --accent2:#0f9d58; --warn:#b45309;
+      --danger:#b91c1c; --soft:#eef4ff; --shadow:0 8px 24px rgba(15,23,42,.08);
+      --radius:16px;
+    }
+    html[data-theme="dark"]{
+      --bg:#0b1220; --panel:#111c30; --text:#e8eefc; --muted:#a8b6cf;
+      --line:#263651; --accent:#63a8ff; --accent2:#4ade80; --warn:#fbbf24;
+      --danger:#f87171; --soft:#152444; --shadow:0 8px 24px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .topbar{position:sticky;top:0;z-index:20;background:var(--panel);border-bottom:1px solid var(--line);padding:12px 16px;box-shadow:var(--shadow)}
+    .topbar-inner{max-width:1100px;margin:0 auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;margin-right:auto}
+    .brand-mark{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#ef4444,#f59e0b);display:grid;place-items:center;color:#fff;font-weight:900;font-size:13px}
+    .brand small{display:block;font-weight:500;font-size:11px;color:var(--muted)}
+    .search-wrap{position:relative;flex:1;min-width:220px;max-width:380px}
+    .search-wrap input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--text)}
+    .search-results{position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);max-height:320px;overflow:auto;padding:6px;display:none}
+    .search-results.show{display:block}
+    .search-results button{display:block;width:100%;text-align:left;background:none;border:0;color:var(--text);padding:9px;border-radius:9px;cursor:pointer}
+    .search-results button:hover{background:var(--soft)}
+    .search-results small{display:block;color:var(--muted)}
+    button,.btn{font:inherit}
+    .icon-btn{border:1px solid var(--line);background:var(--bg);color:var(--text);border-radius:12px;padding:9px 12px;cursor:pointer}
+    nav{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+    nav::-webkit-scrollbar{display:none}
+    nav button{white-space:nowrap;border:1px solid var(--line);background:var(--panel);color:var(--muted);padding:9px 14px;border-radius:999px;cursor:pointer;font-size:14px}
+    nav button.active{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700}
+    main{max-width:1100px;margin:0 auto;padding:8px 16px 60px}
+    .view{display:none;animation:fade .2s ease}
+    .view.active{display:block}
+    @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+    h1{font-size:clamp(24px,4vw,36px);line-height:1.15;margin:18px 0 8px}
+    h2{font-size:clamp(20px,3vw,27px);margin:28px 0 12px}
+    h3{margin:18px 0 8px;font-size:18px}
+    p{margin:8px 0}
+    .lead{font-size:18px;color:var(--muted);max-width:760px}
+    .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+    .card h3{margin-top:0}
+    .card p:last-child{margin-bottom:0}
+    .card.click{cursor:pointer}
+    .card.click:hover{border-color:var(--accent);transform:translateY(-1px)}
+    .pill{display:inline-block;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--soft);color:var(--accent);margin:0 4px 6px 0}
+    .pill.green{background:rgba(15,157,88,.12);color:var(--accent2)}
+    .pill.warn{background:rgba(180,83,9,.12);color:var(--warn)}
+    .pill.red{background:rgba(185,28,28,.12);color:var(--danger)}
+    .notice{border-left:4px solid var(--warn);background:var(--soft);padding:14px 16px;border-radius:12px;margin:16px 0}
+    .notice.danger{border-color:var(--danger)}
+    .notice.good{border-color:var(--accent2)}
+    .steps{counter-reset:s;display:grid;gap:12px}
+    .step{position:relative;padding-left:52px}
+    .step::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800}
+    table{width:100%;border-collapse:collapse;background:var(--panel);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);font-size:14px}
+    th,td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{background:var(--soft);font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+    tr:last-child td{border-bottom:0}
+    .check-group{margin:18px 0}
+    .check-group h3{display:flex;align-items:center;gap:8px}
+    .check{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:var(--panel);margin:7px 0}
+    .check input{margin-top:4px;width:18px;height:18px;accent-color:var(--accent)}
+    .check.done{opacity:.62}
+    .check.done label{text-decoration:line-through}
+    .progress-wrap{position:sticky;top:70px;z-index:10;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:14px 0;box-shadow:var(--shadow)}
+    .bar{height:9px;background:var(--line);border-radius:999px;overflow:hidden;margin-top:8px}
+    .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .25s}
+    .form-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+    label.field{display:block;font-size:13px;color:var(--muted)}
+    label.field input,label.field select{width:100%;margin-top:5px;padding:10px 11px;border:1px solid var(--line);border-radius:11px;background:var(--bg);color:var(--text)}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+    .btn{border:0;border-radius:11px;padding:10px 15px;background:var(--accent);color:#fff;font-weight:700;cursor:pointer}
+    .btn.secondary{background:var(--soft);color:var(--text);border:1px solid var(--line)}
+    .btn.green{background:var(--accent2)}
+    .result{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin:16px 0}
+    .metric{background:var(--soft);border-radius:14px;padding:14px}
+    .metric b{display:block;font-size:26px;line-height:1.1}
+    .metric span{font-size:12px;color:var(--muted)}
+    pre{white-space:pre-wrap;word-wrap:break-word;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;max-height:340px;overflow:auto;margin:0}
+    .template{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin:14px 0;box-shadow:var(--shadow)}
+    .template-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
+    .template-head h3{margin:0}
+    ul,ol{padding-left:22px}
+    li{margin:6px 0}
+    .link-card{display:block;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow)}
+    .link-card b{display:block}
+    .link-card span{display:block;font-size:12px;color:var(--muted);word-break:break-all}
+    .muted{color:var(--muted)}
+    .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+    footer{border-top:1px solid var(--line);padding:24px 16px;text-align:center;color:var(--muted);font-size:13px}
+    .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#111827;color:#fff;padding:11px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s;z-index:50;font-size:14px}
+    .toast.show{opacity:1;transform:translateX(-50%)}
+    [hidden]{display:none!important}
+    @media (max-width:640px){
+      .brand{font-size:16px}.brand small{display:none}
+      .search-wrap{order:3;max-width:none;flex-basis:100%}
+      th,td{padding:9px 8px;font-size:13px}
+    }
+    @media print{
+      .topbar,nav,.actions,.toast{display:none!important}
+      body{background:#fff;color:#000}
+      .view{display:block!important;page-break-after:always}
+      .card,table,pre,.template{box-shadow:none;background:#fff;border-color:#999}
+    }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark">1688</div>
+      <div>Китай без обмана<small>гайд · калькулятор · шаблоны</small></div>
+    </div>
+    <div class="search-wrap">
+      <input id="search" type="search" placeholder="Поиск: посредник, таможня, смета…" aria-label="Поиск по приложению">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <button class="icon-btn" id="themeBtn" title="Сменить тему">🌙</button>
+  </div>
+</div>
+
+<nav id="tabs" aria-label="Разделы">
+  <button class="active" data-tab="home">Главная</button>
+  <button data-tab="platforms">Где дешевле</button>
+  <button data-tab="checklist">Чек-лист</button>
+  <button data-tab="calc">Смета</button>
+  <button data-tab="templates">Шаблоны</button>
+  <button data-tab="report">Отчёт</button>
+  <button data-tab="customs">Таможня</button>
+  <button data-tab="links">Ссылки</button>
+</nav>
+
+<main>
+  <!-- ================= ГЛАВНАЯ ================= -->
+  <section class="view active" id="view-home">
+    <h1>Заказывай из Китая без курсов и без обмана</h1>
+    <p class="lead">Всё, что нужно: куда идти, как проверить продавца и посредника, как посчитать полную цену, как написать, как принять товар и что делать при браке. Работает офлайн.</p>
+
+    <div class="notice danger" data-title="1687 — ошибка">
+      <b>1687 — не существует.</b> Правильный сайт — <a href="https://www.1688.com" target="_blank" rel="noopener">1688.com</a>. Если скинули ссылку на «1687» — это опечатка или ловушка. Не оплачивайте.
+    </div>
+
+    <h2>Что заказывать: выбор за 10 секунд</h2>
+    <div class="grid">
+      <div class="card click searchable" data-title="1–2 вещи быстро: AliExpress" data-go="platforms">
+        <span class="pill green">Быстро</span><span class="pill">Прямо в РФ</span>
+        <h3>1–2 вещи, чтобы просто</h3>
+        <p><b>AliExpress</b> или <b>Ozon Global / Wildberries</b>. Карта или СБП, русский язык, посредник не нужен. Но цена выше, чем на 1688.</p>
+        <p class="muted">Пример: обувь с твоей бирки на Wildberries — от 1 751 ₽.</p>
+      </div>
+      <div class="card click searchable" data-title="Дёшево: 1688 и PDD через посредника" data-go="platforms">
+        <span class="pill warn">Дёшево</span><span class="pill">14–25 дней</span>
+        <h3>Хочешь реально дёшево</h3>
+        <p><b>1688</b> — опт от производителя. <b>Pinduoduo</b> — дешёвая розница на 1 штуку. <b>Taobao</b> — огромный выбор.</p>
+        <p class="muted">Все трое не шлют в РФ сами. Нужен посредник с китайским складом.</p>
+      </div>
+      <div class="card click searchable" data-title="Партия и поставщик: Alibaba.com" data-go="platforms">
+        <span class="pill">Опт</span><span class="pill">Инвойс</span>
+        <h3>Как с поставщиком</h3>
+        <p><b>Alibaba.com</b> — международный опт, проформа-инвойс, поставщик может отправить в РФ. Но обычно на 20–50% дороже 1688.</p>
+        <p class="muted">Минимальная партия часто 10–100+ штук.</p>
+      </div>
+    </div>
+
+    <h2>Как пользоваться приложением</h2>
+    <div class="steps">
+      <div class="step searchable" data-title="Шаг 1: прочитать где дешевле"><b>Прочитай «Где дешевле».</b> Выбери одну схему под свою задачу.</div>
+      <div class="step searchable" data-title="Шаг 2: проверить по чек-листу"><b>Прогони продавца и посредника по чек-листу.</b> Ни одна оплата до проверки.</div>
+      <div class="step searchable" data-title="Шаг 3: посчитать смету"><b>Посчитай полную смету.</b> Не цена товара, а товар + выкуп + доставка + таможня.</div>
+      <div class="step searchable" data-title="Шаг 4: написать по шаблону"><b>Напиши продавцу и посреднику по готовому шаблону.</b> Китайский и английский уже есть.</div>
+      <div class="step searchable" data-title="Шаг 5: фотоотчёт и отчёт"><b>Требуй фотоотчёт на складе.</b> После получения заполни отчёт и сравни цену с РФ.</div>
+    </div>
+
+    <div class="notice good">
+      <b>Главное правило:</b> первый заказ — тестовый, на 500–1500 ₽, без бренда и без опта. Прошёл весь путь — только потом партия.
+    </div>
+
+    <div class="notice">
+      <b>Курсы не нужны.</b> Всё, что продают за 3–5 тысяч, лежит открыто на 1688, customs.gov.ru и в этом приложении. Не покупай «доступ к секретной базе поставщиков».
+    </div>
+  </section>
+
+  <!-- ================= ПЛОЩАДКИ ================= -->
+  <section class="view" id="view-platforms">
+    <h1>Где дешевле</h1>
+    <div class="notice danger" data-title="1687 не существует, правильный сайт 1688.com">
+      <b>Ещё раз: 1688.com, а не 1687.</b> Проверь адрес в строке браузера перед оплатой.
+    </div>
+
+    <table>
+      <thead><tr><th>Сайт</th><th>Что это</th><th>Прямо в РФ</th><th>Минимум</th><th>Когда брать</th></tr></thead>
+      <tbody>
+        <tr class="searchable" data-title="1688.com опт Китая самый дешёвый"><td><a href="https://www.1688.com" target="_blank" rel="noopener"><b>1688.com</b></a></td><td>Опт Китая, цены от производителя</td><td><span class="pill red">Нет</span> посредник</td><td>2–10 шт</td><td>Партия. Самый низкий прайс, но нужен китайский адрес и оплата.</td></tr>
+        <tr class="searchable" data-title="Pinduoduo PDD дешёвая розница"><td><a href="https://www.pinduoduo.com" target="_blank" rel="noopener"><b>Pinduoduo</b></a></td><td>Очень дешёвая розница внутри Китая</td><td><span class="pill red">Нет</span> посредник</td><td>1 шт</td><td>Иногда дешевле 1688 на одну вещь. Качество — лотерея.</td></tr>
+        <tr class="searchable" data-title="Taobao розница Китая"><td><a href="https://www.taobao.com" target="_blank" rel="noopener"><b>Taobao</b></a></td><td>Розница Китая, огромный выбор</td><td><span class="pill red">Нет</span> посредник</td><td>1 шт</td><td>Чуть дороже PDD, но выбор больше.</td></tr>
+        <tr class="searchable" data-title="Alibaba.com поставщик инвойс"><td><a href="https://www.alibaba.com" target="_blank" rel="noopener"><b>Alibaba.com</b></a></td><td>Международный опт для иностранцев</td><td><span class="pill green">Да</span> поставщик</td><td>10–100+ шт</td><td>Нужен поставщик, счёт, бумажки. Цена обычно +20–50% к 1688.</td></tr>
+        <tr class="searchable" data-title="AliExpress прямо в Россию карта СБП"><td><a href="https://www.aliexpress.com" target="_blank" rel="noopener"><b>AliExpress</b></a></td><td>Розница для РФ, русский интерфейс</td><td><span class="pill green">Да</span> карта/СБП</td><td>1 шт</td><td>Просто и удобно, но не самый дешёвый.</td></tr>
+        <tr class="searchable" data-title="Ozon Global Wildberries китайские продавцы"><td><a href="https://www.ozon.ru" target="_blank" rel="noopener"><b>Ozon Global</b></a> / <a href="https://www.wildberries.ru" target="_blank" rel="noopener"><b>Wildberries</b></a></td><td>Китайские продавцы на российской площадке</td><td><span class="pill green">Да</span></td><td>1 шт</td><td>Быстро и понятно, но дороже, чем 1688/PDD.</td></tr>
+        <tr class="searchable" data-title="Poizon JD Tmall только через посредника"><td><a href="https://www.poizon.com" target="_blank" rel="noopener"><b>Poizon</b></a>, <a href="https://www.jd.com" target="_blank" rel="noopener"><b>JD</b></a>, <a href="https://www.tmall.com" target="_blank" rel="noopener"><b>Tmall</b></a></td><td>Внутренние китайские площадки</td><td><span class="pill red">Нет</span> посредник</td><td>1 шт</td><td>Только через выкуп на китайский склад.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Короткий ответ</h2>
+    <ol>
+      <li class="searchable" data-title="Реально дёшево 1688 или PDD плюс посредник"><b>Реально дёшево:</b> 1688 (опт) или Pinduoduo (1 штука) + посредник. Жди 14–25 дней.</li>
+      <li class="searchable" data-title="Просто прямо в РФ AliExpress Ozon"><b>Просто прямо в РФ:</b> AliExpress или Ozon Global. Дороже, но без китайского адреса.</li>
+      <li class="searchable" data-title="Поставщик напрямую Alibaba"><b>Поставщик напрямую:</b> Alibaba.com с инвойсом и партией — не самый дешёвый, но официальнее.</li>
+    </ol>
+
+    <div class="notice">
+      <b>Пример с обувью.</b> Бирка: 市场零售价 <span class="mono">RMB 49.00</span> ≈ 550–600 ₽. Одна пара через посредника выходит ≈ 1 538 ₽. На Wildberries похожее — 1 751 ₽. Выгода мизер. Партия 10 пар — примерно 1 100 ₽ за пару. Считай в разделе «Смета».
+    </div>
+  </section>
+
+  <!-- ================= ЧЕК-ЛИСТ ================= -->
+  <section class="view" id="view-checklist">
+    <h1>Чек-лист перед оплатой</h1>
+    <p class="lead">Состояние сохраняется в браузере. Отмечай галочки — прогресс не пропадёт.</p>
+    <div class="progress-wrap">
+      <div style="display:flex;justify-content:space-between;gap:10px"><b>Готовность заказа</b><span id="checkProgress">0 из 0</span></div>
+      <div class="bar"><i id="checkBar"></i></div>
+    </div>
+    <div class="actions">
+      <button class="btn secondary" id="checkReset">Сбросить галочки</button>
+      <button class="btn secondary" id="checkCopy">Скопировать текст чек-листа</button>
+    </div>
+
+    <div class="check-group">
+      <h3>А. Продавец на 1688 / Taobao / PDD</h3>
+      <div class="check"><input class="check-input" type="checkbox"><label>Ссылка на нужный домен: 1688.com, taobao.com, pinduoduo.com. Не «1687», не ссылка из СМС.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>В браузере https и замок.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>У продавца есть рейтинг, число сделок и отзывы.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Отзывы разные, с реальными фото покупателей, а не одной картинкой.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Продавец отвечает на вопросы из раздела «Шаблоны».</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Есть точный артикул, цвет, размер, вес, состав, комплект.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Продавец согласен отправить на склад посредника в Китае.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Нет требований «переведи на карту физлица» или «оплата вне сайта».</label></div>
+    </div>
+
+    <div class="check-group">
+      <h3>Б. Посредник</h3>
+      <div class="check"><input class="check-input" type="checkbox"><label>Юрлицо или ИП: название, ИНН, договор или публичная оферта.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Есть сайт, поддержка, телефон и адрес склада в Китае.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Тарифы заранее: выкуп %, доставка по Китаю, карго за кг, хранение, РФ, страховка.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Фотоотчёт на складе с твоим номером заказа и датой.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Трекинг после отправки из Китая.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Прописано, кто предъявляет претензию продавцу при браке — посредник.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Прописаны сроки: приём, отправка, доставка в РФ.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Отвечает до оплаты, а не «потом разберёмся».</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Не просит занижать декларацию и дробить посылки.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Не обещает «100% гарантию», «без таможни вообще», «обойдём закон».</label></div>
+    </div>
+
+    <div class="check-group">
+      <h3>В. Товар</h3>
+      <div class="check"><input class="check-input" type="checkbox"><label>Артикул совпадает с карточкой и биркой на фотоотчёте.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Размер и цвет совпадают с заказом.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Вес совпадает с расчётом (взвешивание на складе).</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Комплектность: что именно должно лежать в коробке.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Нет брака на фото: пятна, швы, трещины, перекосы.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Нет подделки под бренд: «Adidas/Gore-Tex» по 49 юаней — почти всегда реплика.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Уточнены ограничения: батарейки, жидкости, порошки, ножи, лекарства, семена.</label></div>
+    </div>
+
+    <div class="check-group">
+      <h3>Г. Тестовый заказ</h3>
+      <div class="check"><input class="check-input" type="checkbox"><label>Сумма 500–1500 ₽, одна-две вещи, без бренда.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Оплата только после согласованной сметы.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Сохранены скрин карточки, переписка, оплата, трек, фотоотчёт, видео вскрытия.</label></div>
+      <div class="check"><input class="check-input" type="checkbox"><label>Результат записан в разделе «Отчёт».</label></div>
+    </div>
+
+    <div class="notice danger" data-title="Красные флаги посредника и продавца">
+      <b>Красные флаги — сразу отказ:</b> оплата на личную карту; цена в разы ниже рынка и только «сегодня»; нет договора и адреса склада; просят «занизить стоимость»; отвечают «не волнуйтесь, всё нормально» вместо письменного ответа.
+    </div>
+  </section>
+
+  <!-- ================= СМЕТА ================= -->
+  <section class="view" id="view-calc">
+    <h1>Смета: полная стоимость</h1>
+    <p class="lead">Не бери цену товара как итог. Считай: товар + выкуп + Китай + карго + Россия + таможня. Потом сравни цену за штуку с ценой в РФ.</p>
+
+    <div class="card">
+      <h3>Параметры</h3>
+      <div class="form-grid">
+        <label class="field">Товар, юаней<input id="cny" type="number" value="49" min="0" step="0.01"></label>
+        <label class="field">Курс ₽ за 1 юань<input id="rate" type="number" value="11.2" min="0" step="0.01"></label>
+        <label class="field">Комиссия выкупа, %<input id="feePct" type="number" value="5" min="0" step="0.1"></label>
+        <label class="field">Доставка по Китаю, ₽<input id="chinaShip" type="number" value="30" min="0" step="1"></label>
+        <label class="field">Вес, кг<input id="weight" type="number" value="0.8" min="0" step="0.01"></label>
+        <label class="field">Тариф карго, ₽/кг<input id="tariff" type="number" value="850" min="0" step="1"></label>
+        <label class="field">Последняя миля по РФ, ₽<input id="lastMile" type="number" value="250" min="0" step="1"></label>
+        <label class="field">Таможня, ₽<input id="customs" type="number" value="0" min="0" step="1"></label>
+        <label class="field">Количество, шт<input id="qty" type="number" value="1" min="1" step="1"></label>
+        <label class="field">Цена в РФ за штуку, ₽<input id="rfPrice" type="number" value="1751" min="0" step="1"></label>
+      </div>
+      <p class="muted">Автотариф карго: до 3 кг — 850 ₽/кг; 3–5 кг — 723 ₽/кг; 5–10 кг — 553 ₽/кг. Тарифы меняются — уточняй на дату заказа.</p>
+      <div class="actions">
+        <button class="btn" id="calcBtn">Рассчитать</button>
+        <button class="btn secondary" id="autoTariff">Подставить автотариф</button>
+        <button class="btn secondary" data-preset="one">Пример: 1 пара</button>
+        <button class="btn secondary" data-preset="ten">Пример: 10 пар</button>
+        <button class="btn green" id="copyCalc">Скопировать результат</button>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="metric"><b id="outTotal">—</b><span>Итого за заказ</span></div>
+      <div class="metric"><b id="outUnit">—</b><span>Цена за штуку</span></div>
+      <div class="metric"><b id="outDiff">—</b><span id="outVerdict">Сравнение с РФ</span></div>
+      <div class="metric"><b id="outWeights">—</b><span>Вес × тариф</span></div>
+    </div>
+    <pre id="calcText">Заполни параметры и нажми «Рассчитать».</pre>
+
+    <h2>Формула</h2>
+    <pre>ИТОГО = Товар (юани × курс)
+      + комиссия выкупа
+      + доставка по Китаю
+      + вес × тариф карго
+      + последняя миля по РФ
+      + таможня
+
+Цена за штуку = ИТОГО / количество
+Выгода = цена в РФ − цена за штуку</pre>
+
+    <div class="notice" data-title="Таможня лимит 200 евро 31 кг">
+      Ориентир для личной посылки: до 200 евро и до 31 кг беспошлинно. Превышение — пошлина. Не занижай стоимость и не дроби партию. Точный расчёт — customs.gov.ru.
+    </div>
+  </section>
+
+  <!-- ================= ШАБЛОНЫ ================= -->
+  <section class="view" id="view-templates">
+    <h1>Готовые сообщения и претензия</h1>
+    <p class="lead">Копируй, заменяй скобки, отправляй до оплаты. Китайский и английский тексты можно слать через переводчик.</p>
+
+    <div class="template">
+      <div class="template-head"><h3>Продавцу на 1688 / Taobao / PDD</h3><button class="btn secondary" data-copy="tplCn">Копировать</button></div>
+      <pre id="tplCn">你好，请问这款还有货吗？
+最低起订量是多少？
+单价：1件 / 10件 / 50件 分别是多少？
+重量是多少公斤？
+能否提供实物照片和打包视频？
+可以发到中国仓库（地址我会提供）吗？
+是否有现货？发货时间几天？
+可以支持验货后付款吗？
+
+Перевод:
+Здравствуйте, этот товар ещё в наличии?
+Какое минимальное количество заказа?
+Цена за 1 / 10 / 50 штук?
+Вес в килограммах?
+Можете прислать реальные фото и видео упаковки?
+Можете отправить на китайский склад (адрес дам)?
+Есть ли остаток? Сколько дней до отправки?
+Можно оплатить после проверки товара?</pre>
+    </div>
+
+    <div class="template">
+      <div class="template-head"><h3>Поставщику на Alibaba.com (English)</h3><button class="btn secondary" data-copy="tplEn">Копировать</button></div>
+      <pre id="tplEn">Hello. I am interested in this item.
+
+Please confirm:
+1. Is it in stock?
+2. MOQ and unit price for 1 / 10 / 50 pcs.
+3. Product weight and carton size.
+4. Can you provide real photos and a packing video?
+5. Can you ship to my agent's warehouse in China?
+6. What are the payment terms? Trade Assurance?
+7. Do you have a proforma invoice and export documents?
+8. What is the lead time?
+
+Please send the proforma invoice before I pay anything.</pre>
+    </div>
+
+    <div class="template">
+      <div class="template-head"><h3>Посреднику до оплаты (главный)</h3><button class="btn secondary" data-copy="tplRu">Копировать</button></div>
+      <pre id="tplRu">Здравствуйте.
+
+Хочу выкупить товар по ссылке: [вставьте точную ссылку]
+
+Пожалуйста, до оплаты подтвердите:
+1. Есть ли товар в наличии, артикул, цвет, размер.
+2. Цена товара за 1 шт и за [N] шт.
+3. Вес одной единицы и общий вес.
+4. Комиссия выкупа в процентах и в рублях.
+5. Доставка по Китаю до вашего склада.
+6. Тариф карго до России за кг и срок.
+7. Доставка по России до [Екатеринбург / ПВЗ].
+8. Условия фотоотчёта: с моим номером заказа и датой.
+9. Что делаете при браке: кто пишет претензию продавцу и какие сроки возврата.
+10. Номер договора/оферты и реквизиты, кому именно я плачу.
+
+Прошу прислать полную смету до оплаты. Без согласованной сметы
+и фотоотчёта на складе я не подтверждаю отправку.
+
+Мой номер заказа у вас: ______
+Город доставки: Екатеринбург.</pre>
+    </div>
+
+    <div class="template">
+      <div class="template-head"><h3>Претензия при браке или пересорте</h3><button class="btn secondary" data-copy="tplClaim">Копировать</button></div>
+      <pre id="tplClaim">Претензия по заказу №______ от ______
+
+Я [ФИО] заказал(а) через ваш сервис товар по ссылке: ______
+Оплачено: ______ ₽, дата оплаты ______.
+
+При получении ______ обнаружено расхождение:
+- заказано: ______
+- получено: ______
+- артикул / размер / цвет / комплектность: ______
+
+ТРЕБУЮ в течение 10 календарных дней:
+1. вернуть стоимость товара и доставку ______ ₽;
+2. либо доставить надлежащий товар за ваш счёт;
+3. либо дать письменный мотивированный отказ.
+
+Товар и упаковку не выбрасываю, видео вскрытия и переписку сохранил(а).
+
+Приложения: скрин товара, оплата, смета, фотоотчёт,
+видео вскрытия, фото полученного, переписка.
+
+Дата: ______  Подпись: ______ / ______
+Телефон: ______  E-mail: ______</pre>
+    </div>
+
+    <div class="notice">
+      <b>Кто пишет претензию продавцу?</b> Посредник — он покупал от своего имени. Ты даёшь ему доказательства и требуешь действия по своему договору с ним.
+    </div>
+  </section>
+
+  <!-- ================= ОТЧЁТ ================= -->
+  <section class="view" id="view-report">
+    <h1>Отчёт по заказу</h1>
+    <p class="lead">Заполняй после каждого заказа. Данные сохраняются в браузере, текст можно скачать файлом.</p>
+    <div class="card">
+      <div class="form-grid">
+        <label class="field">Дата заказа<input id="rDate" type="date"></label>
+        <label class="field">Заказ у продавца<input id="rSellerOrder" placeholder="№"></label>
+        <label class="field">Заказ у посредника<input id="rAgentOrder" placeholder="№"></label>
+        <label class="field">Продавец<input id="rSeller"></label>
+        <label class="field">Посредник<input id="rAgent"></label>
+        <label class="field">Ссылка на товар<input id="rLink"></label>
+        <label class="field">Оплачено, ₽<input id="rPaid" type="number" min="0"></label>
+        <label class="field">Трек<input id="rTrack"></label>
+        <label class="field">Вес фактический, кг<input id="rWeight" type="number" min="0" step="0.01"></label>
+        <label class="field">Цена за штуку по факту, ₽<input id="rUnit" type="number" min="0"></label>
+        <label class="field">Цена в РФ, ₽<input id="rRf" type="number" min="0"></label>
+        <label class="field">Срок доставки, дней<input id="rDays" type="number" min="0"></label>
+      </div>
+      <label class="field" style="margin-top:12px">Расхождение / дефекты<textarea id="rIssue" rows="3" style="width:100%;margin-top:5px;padding:10px;border:1px solid var(--line);border-radius:11px;background:var(--bg);color:var(--text)"></textarea></label>
+      <label class="field" style="margin-top:12px">Решение<textarea id="rDecision" rows="2" style="width:100%;margin-top:5px;padding:10px;border:1px solid var(--line);border-radius:11px;background:var(--bg);color:var(--text)" placeholder="Повторить / сменить продавца / взять партию / больше не заказывать"></textarea></label>
+      <div class="actions">
+        <button class="btn" id="rSave">Сохранить в браузере</button>
+        <button class="btn green" id="rDownload">Скачать .txt</button>
+        <button class="btn secondary" id="rClear">Очистить</button>
+      </div>
+    </div>
+
+    <h2>Что требовать в фотоотчёте на складе</h2>
+    <ol>
+      <li>Товар целиком + листок с надписью «Заказ №…, дата …».</li>
+      <li>Бирка/этикетка крупно: артикул, размер, цвет, состав.</li>
+      <li>Упаковка со всех сторон.</li>
+      <li>Взвешивание на весах, чтобы был виден вес.</li>
+      <li>Комплектность разложена рядом.</li>
+      <li>Дефекты крупным планом, если есть.</li>
+      <li>Упакованный пакет с наклейкой номера заказа.</li>
+      <li>Трек-наклейка после отправки.</li>
+    </ol>
+    <div class="notice danger">Если фото нет или на нём не видно номер и дату — не подтверждай отправку. При получении снимай видео вскрытия.</div>
+  </section>
+
+  <!-- ================= ТАМОЖНЯ ================= -->
+  <section class="view" id="view-customs">
+    <h1>Таможня, красные флаги, обучение</h1>
+    <div class="notice" data-title="Таможня 200 евро 31 кг">
+      <b>Ориентир для личной посылки:</b> до 200 euro и до 31 кг. 200 euro ≈ 20 000 ₽. Превышение — пошлина: ориентир 15% от стоимостного превышения или 2 euro за кг весового превышения, что больше. Точный расчёт — <a href="https://customs.gov.ru" target="_blank" rel="noopener">customs.gov.ru</a>.
+    </div>
+    <div class="notice danger" data-title="Не занижай декларацию не дроби посылки">
+      <b>Не делай так:</b> не занижай стоимость, не пиши «подарок» вместо цены, не дроби одну партию на много посылок в один день. Партия на продажу — это коммерческий импорт, а не личная посылка.
+    </div>
+
+    <h2>Часто проблемные товары</h2>
+    <div class="grid">
+      <div class="card searchable" data-title="Ограничения подделки бренды"><span class="pill red">Риск</span><h3>Подделки под бренды</h3><p>Adidas / Nike / Gore-Tex по 49 юаней — почти всегда реплика. Риск задержки и проблемы при перепродаже.</p></div>
+      <div class="card searchable" data-title="Ограничения батарейки жидкости"><span class="pill warn">Уточнять</span><h3>Батарейки и жидкости</h3><p>Аккумуляторы, гели, аэрозоли, парфюмерия — особенно при авиадоставке.</p></div>
+      <div class="card searchable" data-title="Ограничения порошки лекарства продукты"><span class="pill warn">Уточнять</span><h3>Порошки, лекарства, продукты</h3><p>БАДы, семена, продукты животного происхождения, ножи, радиопередатчики.</p></div>
+    </div>
+
+    <h2>Красные флаги — не покупай</h2>
+    <ul>
+      <li class="searchable" data-title="Курс за 5000 не покупать">«Доступ к секретной базе поставщиков за 5 000 ₽».</li>
+      <li class="searchable" data-title="Курс за 3000 не покупать">«Курс за 3 000 ₽, после оплаты пришлю ссылки».</li>
+      <li class="searchable" data-title="Занижение декларации">«Мы занизим декларацию, так дешевле».</li>
+      <li class="searchable" data-title="Гарантия 100 процентов">«Гарантия 100%, вернём в любом случае» — требуй договор.</li>
+      <li class="searchable" data-title="Оплата картой физлица">«Оплата картой физлица, не через сайт».</li>
+    </ul>
+
+    <h2>Бесплатное обучение вместо курсов</h2>
+    <ol>
+      <li><a href="https://customs.gov.ru" target="_blank" rel="noopener">customs.gov.ru</a> — раздел для физлиц, беспошлинный ввоз, ограничения и запреты.</li>
+      <li>Решение Совета ЕЭК № 107 — правила беспошлинного ввоза ЕАЭС.</li>
+      <li><a href="https://help.aliexpress.com" target="_blank" rel="noopener">help.aliexpress.com</a>, <a href="https://help.ozon.ru" target="_blank" rel="noopener">help.ozon.ru</a> — доставка, споры, возвраты.</li>
+      <li><a href="https://help.alibaba.com" target="_blank" rel="noopener">help.alibaba.com</a> — Trade Assurance, оплата, инвойс.</li>
+      <li>1688.com → «规则 / Rules» — правила площадки, переводчик браузера поможет.</li>
+      <li>YouTube / VC / Rutube: «1688 выкуп пошагово», «как проверить продавца 1688». Смотри бесплатно, не покупай «доступ».</li>
+      <li>Свои 3 тестовых заказа + заполненные отчёты — лучший учебник.</li>
+    </ol>
+
+    <h2>План на первые дни</h2>
+    <div class="steps">
+      <div class="step">День 1. Прочитай «Где дешевле». Выбери одну вещь за 500–1500 ₽.</div>
+      <div class="step">День 2. Проверь по чек-листу. Напиши по шаблону.</div>
+      <div class="step">День 3. Посчитай смету. Выбери посредника.</div>
+      <div class="step">День 4. Оплати тест, сохрани доказательства.</div>
+      <div class="step">Дни 5–20. Жди, требуй фотоотчёт и трек.</div>
+      <div class="step">День получения. Видео вскрытия, отчёт, решение: повторить или нет.</div>
+    </div>
+  </section>
+
+  <!-- ================= ССЫЛКИ ================= -->
+  <section class="view" id="view-links">
+    <h1>Ссылки и навигация</h1>
+    <p class="lead">Открывай сам и проверяй адрес в строке браузера. Особенно число 8 в 1688.</p>
+    <h2>Площадки</h2>
+    <div class="grid">
+      <a class="link-card searchable" data-title="1688.com опт" href="https://www.1688.com" target="_blank" rel="noopener"><b>1688.com</b><span>Опт Китая. Не «1687»!</span></a>
+      <a class="link-card searchable" data-title="Pinduoduo PDD" href="https://www.pinduoduo.com" target="_blank" rel="noopener"><b>Pinduoduo</b><span>Дешёвая розница внутри Китая</span></a>
+      <a class="link-card searchable" data-title="Taobao" href="https://www.taobao.com" target="_blank" rel="noopener"><b>Taobao</b><span>Розница Китая, огромный выбор</span></a>
+      <a class="link-card searchable" data-title="Alibaba.com" href="https://www.alibaba.com" target="_blank" rel="noopener"><b>Alibaba.com</b><span>Международный опт и поставщики</span></a>
+      <a class="link-card searchable" data-title="AliExpress" href="https://www.aliexpress.com" target="_blank" rel="noopener"><b>AliExpress</b><span>Прямо в РФ, карта и СБП</span></a>
+      <a class="link-card searchable" data-title="Ozon Global" href="https://www.ozon.ru" target="_blank" rel="noopener"><b>Ozon Global</b><span>Китайские продавцы на российской площадке</span></a>
+      <a class="link-card searchable" data-title="Wildberries" href="https://www.wildberries.ru" target="_blank" rel="noopener"><b>Wildberries</b><span>Китайские продавцы, быстро</span></a>
+    </div>
+    <h2>Правила и помощь</h2>
+    <div class="grid">
+      <a class="link-card searchable" data-title="ФТС customs.gov.ru" href="https://customs.gov.ru" target="_blank" rel="noopener"><b>customs.gov.ru</b><span>Официальная таможня РФ</span></a>
+      <a class="link-card searchable" data-title="AliExpress help" href="https://help.aliexpress.com" target="_blank" rel="noopener"><b>help.aliexpress.com</b><span>Доставка, споры, возвраты</span></a>
+      <a class="link-card searchable" data-title="Ozon help" href="https://help.ozon.ru" target="_blank" rel="noopener"><b>help.ozon.ru</b><span>Правила продавцов и возврата</span></a>
+      <a class="link-card searchable" data-title="Alibaba help" href="https://help.alibaba.com" target="_blank" rel="noopener"><b>help.alibaba.com</b><span>Trade Assurance, инвойс, оплата</span></a>
+    </div>
+    <div class="notice">Полные тексты всех инструкций лежат в папке <span class="mono">docs/</span> репозитория — их можно открыть прямо на GitHub.</div>
+  </section>
+</main>
+
+<footer>
+  Китай без обмана · офлайн-приложение · сделано 25.11.2026 · правила и тарифы меняются — проверяй на дату заказа
+</footer>
+
+<div class="toast" id="toast">Готово</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var $ = function(s, r){ return (r||document).querySelector(s); };
+  var $$ = function(s, r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+
+  function toast(msg){
+    var t = $('#toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toast.timer); toast.timer = setTimeout(function(){ t.classList.remove('show'); }, 1800);
+  }
+
+  /* --- Тема --- */
+  var savedTheme = localStorage.getItem('china-theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  function themeIcon(){ $('#themeBtn').textContent = savedTheme === 'dark' ? '☀️' : '🌙'; }
+  themeIcon();
+  $('#themeBtn').addEventListener('click', function(){
+    savedTheme = savedTheme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('china-theme', savedTheme);
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    themeIcon();
+  });
+
+  /* --- Вкладки --- */
+  function showTab(name){
+    $$('.view').forEach(function(v){ v.classList.toggle('active', v.id === 'view-' + name); });
+    $$('#tabs button').forEach(function(b){ b.classList.toggle('active', b.dataset.tab === name); });
+    if(location.hash !== '#' + name){ history.replaceState(null, '', '#' + name); }
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  $$('#tabs button').forEach(function(b){
+    b.addEventListener('click', function(){ showTab(b.dataset.tab); });
+  });
+  $$('[data-go]').forEach(function(c){ c.addEventListener('click', function(){ showTab(c.dataset.go); }); });
+  var initial = (location.hash || '').replace('#','');
+  if(initial && $('#view-' + initial)) showTab(initial);
+
+  /* --- Поиск --- */
+  var search = $('#search'), results = $('#searchResults');
+  function buildIndex(){
+    return $$('.searchable').map(function(el){
+      var view = el.closest('.view');
+      return {
+        el: el,
+        tab: view ? view.id.replace('view-','') : 'home',
+        title: el.dataset.title || (el.querySelector('b') ? el.querySelector('b').textContent : el.textContent.trim().slice(0,60)),
+        text: el.textContent.replace(/\s+/g,' ').trim().slice(0,180)
+      };
+    });
+  }
+  var index = buildIndex();
+  search.addEventListener('input', function(){
+    var q = search.value.trim().toLowerCase();
+    results.innerHTML = '';
+    if(!q){ results.classList.remove('show'); return; }
+    var found = index.filter(function(i){ return (i.title + ' ' + i.text).toLowerCase().indexOf(q) !== -1; }).slice(0,12);
+    if(!found.length){
+      results.innerHTML = '<button type="button" disabled>Ничего не найдено</button>';
+    } else {
+      found.forEach(function(i){
+        var b = document.createElement('button'); b.type = 'button';
+        b.innerHTML = '<b></b><small></small>';
+        $('b', b).textContent = i.title;
+        $('small', b).textContent = 'Раздел: ' + i.tab + ' · ' + i.text;
+        b.addEventListener('click', function(){ showTab(i.tab); results.classList.remove('show'); search.value=''; setTimeout(function(){ i.el.scrollIntoView({block:'center', behavior:'smooth'}); i.el.style.outline='3px solid var(--accent)'; setTimeout(function(){ i.el.style.outline=''; }, 1600); }, 120); });
+        results.appendChild(b);
+      });
+    }
+    results.classList.add('show');
+  });
+  document.addEventListener('click', function(e){
+    if(!e.target.closest('.search-wrap')) results.classList.remove('show');
+  });
+
+  /* --- Check-list --- */
+  var checks = $$('.check-input');
+  var checkKey = 'china-checks';
+  var state = [];
+  try { state = JSON.parse(localStorage.getItem(checkKey) || '[]'); } catch(e){ state = []; }
+  checks.forEach(function(c, i){ c.checked = !!state[i]; c.addEventListener('change', function(){
+    state = checks.map(function(x){ return x.checked; });
+    localStorage.setItem(checkKey, JSON.stringify(state));
+    updateChecks();
+  }); });
+  function updateChecks(){
+    var done = checks.filter(function(c){ return c.checked; }).length;
+    $('#checkProgress').textContent = done + ' из ' + checks.length;
+    $('#checkBar').style.width = (checks.length ? done / checks.length * 100 : 0) + '%';
+    $$('.check').forEach(function(row, i){ row.classList.toggle('done', !!checks[i] && checks[i].checked); });
+  }
+  updateChecks();
+  $('#checkReset').addEventListener('click', function(){
+    checks.forEach(function(c){ c.checked = false; });
+    localStorage.removeItem(checkKey); updateChecks(); toast('Галочки сброшены');
+  });
+  $('#checkCopy').addEventListener('click', function(){
+    var text = $$('.check-group').map(function(g){
+      return '[' + $('h3', g).textContent.trim() + ']\n' + $$('.check', g).map(function(row, i){
+        return (checks[$$('.check').indexOf(row)] && checks[$$('.check').indexOf(row)].checked ? '[x] ' : '[ ] ') + $('label', row).textContent.trim();
+      }).join('\n');
+    }).join('\n\n');
+    copy(text);
+  });
+
+  /* --- Копирование --- */
+  function copy(text){
+    if(navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(text).then(function(){ toast('Скопировано'); }, function(){ fallbackCopy(text); });
+    } else { fallbackCopy(text); }
+  }
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea'); ta.value = text; ta.style.position='fixed'; ta.style.left='-9999px';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); toast('Скопировано'); }catch(e){ toast('Не получилось — выдели текст вручную'); }
+    document.body.removeChild(ta);
+  }
+  $$('[data-copy]').forEach(function(b){ b.addEventListener('click', function(){ copy($('#' + b.dataset.copy).textContent); }); });
+
+  /* --- Калькулятор --- */
+  var ids = ['cny','rate','feePct','chinaShip','weight','tariff','customs','qty','rfPrice','lastMile'];
+  function val(id){ var n = parseFloat($('#' + id).value); return isFinite(n) ? n : 0; }
+  function money(n){ return new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(Math.round(n)) + ' ₽'; }
+  function autoTariff(){
+    var w = val('weight');
+    $('#tariff').value = w <= 3 ? 850 : (w <= 5 ? 723 : 553);
+  }
+  $('#autoTariff').addEventListener('click', function(){ autoTariff(); calculate(); toast('Автотариф подставлен'); });
+  $$('[data-preset]').forEach(function(b){ b.addEventListener('click', function(){
+    if(b.dataset.preset === 'one'){
+      $('#cny').value=49; $('#weight').value=0.8; $('#tariff').value=850; $('#chinaShip').value=30;
+      $('#lastMile').value=250; $('#qty').value=1; $('#rfPrice').value=1751; $('#customs').value=0;
+    } else {
+      $('#cny').value=490; $('#weight').value=8; $('#tariff').value=553; $('#chinaShip').value=300;
+      $('#lastMile').value=500; $('#qty').value=10; $('#rfPrice').value=1751; $('#customs').value=0;
+    }
+    calculate(); toast('Пример загружен');
+  }); });
+  function calculate(){
+    var goods = val('cny') * val('rate');
+    var fee = goods * val('feePct') / 100;
+    var china = val('chinaShip');
+    var cargo = val('weight') * val('tariff');
+    var last = val('lastMile');
+    var customs = val('customs');
+    var qty = Math.max(1, val('qty'));
+    var total = goods + fee + china + cargo + last + customs;
+    var unit = total / qty;
+    var diff = val('rfPrice') - unit;
+    $('#outTotal').textContent = money(total);
+    $('#outUnit').textContent = money(unit);
+    $('#outDiff').textContent = (diff >= 0 ? '+' : '−') + money(Math.abs(diff));
+    $('#outVerdict').textContent = diff >= 0 ? 'Выгода за штуку' : 'Дороже, чем в РФ';
+    $('#outDiff').style.color = diff >= 0 ? 'var(--accent2)' : 'var(--danger)';
+    $('#outWeights').textContent = val('weight') + ' × ' + val('tariff') + ' ₽';
+    var text =
+      'СМЕТА ЗАКАЗА\n' +
+      'Товар: ' + val('cny') + ' юаней × ' + val('rate') + ' ₽ = ' + money(goods) + '\n' +
+      'Выкуп ' + val('feePct') + '%: ' + money(fee) + '\n' +
+      'Доставка по Китаю: ' + money(china) + '\n' +
+      'Карго: ' + val('weight') + ' кг × ' + val('tariff') + ' ₽ = ' + money(cargo) + '\n' +
+      'Последняя миля: ' + money(last) + '\n' +
+      'Таможня: ' + money(customs) + '\n' +
+      '----------------------------\n' +
+      'ИТОГО: ' + money(total) + '\n' +
+      'Количество: ' + qty + ' шт\n' +
+      'Цена за штуку: ' + money(unit) + '\n' +
+      'Цена в РФ: ' + money(val('rfPrice')) + '\n' +
+      'Результат: ' + (diff >= 0 ? 'выгода ' : 'дороже на ') + money(Math.abs(diff)) + ' за штуку';
+    $('#calcText').textContent = text;
+    return text;
+  }
+  $('#calcBtn').addEventListener('click', function(){ calculate(); toast('Рассчитано'); });
+  $('#copyCalc').addEventListener('click', function(){ copy(calculate()); });
+  ids.forEach(function(id){ $('#' + id).addEventListener('input', calculate); });
+  calculate();
+
+  /* --- Отчёт --- */
+  var rIds = ['rDate','rSellerOrder','rAgentOrder','rSeller','rAgent','rLink','rPaid','rTrack','rWeight','rUnit','rRf','rDays','rIssue','rDecision'];
+  var reportKey = 'china-report';
+  function saveReport(){ var o={}; rIds.forEach(function(id){ o[id] = $('#'+id).value; }); localStorage.setItem(reportKey, JSON.stringify(o)); }
+  function loadReport(){
+    var raw = localStorage.getItem(reportKey); if(!raw) return;
+    try{ var o=JSON.parse(raw); rIds.forEach(function(id){ if(o[id] !== undefined) $('#'+id).value = o[id]; }); }catch(e){}
+  }
+  function reportText(){
+    var labels = {
+      rDate:'Дата заказа', rSellerOrder:'Заказ у продавца', rAgentOrder:'Заказ у посредника',
+      rSeller:'Продавец', rAgent:'Посредник', rLink:'Ссылка на товар', rPaid:'Оплачено',
+      rTrack:'Трек', rWeight:'Вес фактический', rUnit:'Цена за штуку по факту',
+      rRf:'Цена в РФ', rDays:'Срок доставки', rIssue:'Расхождение / дефекты', rDecision:'Решение'
+    };
+    return 'ОТЧЁТ ПО ЗАКАЗУ\n\n' + rIds.map(function(id){ return labels[id] + ': ' + ($('#'+id).value || '—'); }).join('\n') +
+      '\n\nДата заполнения: ' + new Date().toLocaleString('ru-RU');
+  }
+  loadReport();
+  $('#rSave').addEventListener('click', function(){ saveReport(); toast('Отчёт сохранён в браузере'); });
+  $('#rClear').addEventListener('click', function(){ rIds.forEach(function(id){ $('#'+id).value=''; }); localStorage.removeItem(reportKey); toast('Отчёт очищен'); });
+  $('#rDownload').addEventListener('click', function(){
+    saveReport();
+    var blob = new Blob([reportText()], {type:'text/plain;charset=utf-8'});
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'отчёт_по_заказу_' + ($('#rDate').value || 'без_даты') + '.txt';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+    toast('Файл скачан');
+  });
+
+  /* --- Service worker --- */
+  if('serviceWorker' in navigator && location.protocol !== 'file:'){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(){});
+    });
+  }
+})();
+</script>
+</body>
+</html>
