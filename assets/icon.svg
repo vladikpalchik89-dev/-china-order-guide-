@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Китай без обмана">
+  <rect width="512" height="512" rx="108" fill="#0b1220"/>
+  <rect x="56" y="56" width="400" height="400" rx="88" fill="#ef4444"/>
+  <rect x="94" y="94" width="324" height="324" rx="62" fill="#f59e0b"/>
+  <text x="256" y="286" text-anchor="middle" font-family="Arial, sans-serif" font-size="126" font-weight="900" fill="#0b1220">1688</text>
+  <text x="256" y="354" text-anchor="middle" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#0b1220">НЕ 1687</text>
+</svg>
